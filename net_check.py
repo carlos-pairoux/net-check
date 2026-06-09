@@ -74,3 +74,25 @@ def ping(host: str) -> dict:
     except Exception as e:
         return {"error": f"Ping error: {str(e)}"}
 
+# --- Consolidación de resultados ---
+
+def build_report(domain: str = "google.com") -> dict:
+    """Construye el reporte completo de diagnóstico de red.
+    Clave: 'local', 'dns', 'connectivity', 'latency', 'status_summary'."""
+    
+    hostname = get_hostname()
+    local_ip = get_local_ip()
+    dns = resolve_dns(domain)
+    ping_result = ping(domain)
+    
+    status_summary = "ok" if "error" not in dns and ping_result.get("reachable") else "degraded"
+    # Se considera estado "ok" si el DNS resolvió correctamente
+    # y el host respondió al ping. Cualquier fallo parcial resulta en "degraded".
+    
+    return {
+        "local": {**hostname, **local_ip},
+        "dns": dns,
+        "connectivity": ping_result.get("reachable"),
+        "latency": ping_result.get("latency_ms"),
+        "status_summary": status_summary
+    }
