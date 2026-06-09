@@ -96,3 +96,28 @@ def build_report(domain: str = "google.com") -> dict:
         "latency": ping_result.get("latency_ms"),
         "status_summary": status_summary
     }
+
+# --- Punto de entrada ---
+
+def main():
+    """Orquesta el diagnóstico completo y 
+    muestra los resultados en terminal."""
+    report = build_report()
+    # build_report() ejecuta todas las funciones y consolida los resultados
+    # en un único diccionario. Se llama una sola vez para evitar lecturas
+    # inconsistentes si el estado de la red cambia durante la ejecución.
+    
+    for section, data in report.items():
+        print(f"\n--- {section.upper()} ---")
+        # Se recorre el reporte de forma genérica para que cualquier
+        # modificación futura en build_report() no requiera cambios acá.
+        if isinstance(data, dict):
+            for key, value in data.items():
+                print(f"  {key}: {value}")
+        else:
+            print(f"  {data}")
+
+if __name__ == "__main__":
+    # Garantiza que main() sólo se ejecute cuando el script
+    # se lanza directamente, no cuando se importa como módulo.
+    main()
